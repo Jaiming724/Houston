@@ -32,6 +32,12 @@ function App() {
         <div>
             <p>Connected: {'' + isConnected}</p>
             <p>Last pong: {num || '-'}</p>
+            <button onClick={() => {
+                socket.emit("detach")
+            }}>Detach</button>
+            <button onClick={() => {
+                socket.emit("attach")
+            }}>attach</button>
         </div>
     );
 }
