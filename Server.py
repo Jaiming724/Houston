@@ -1,6 +1,7 @@
 import serial
 from aiohttp import web
 import socketio
+import time
 
 ser = serial.Serial('COM5', 9600)
 
@@ -16,15 +17,10 @@ async def background_task():
         await sio.sleep(0.01)
         try:
             line = ser.readline().decode('utf-8').strip()
-            print(line)
-            await sio.emit('returnData', line)
+            await sio.emit('returnData', {"data":line,"time":round(time.time() * 1000)})
         except UnicodeDecodeError:
             print("Unicode error")
 
-
-@sio.event
-def connect(sid, environ):
-    print("connect ", sid)
 
 
 @sio.event
@@ -39,6 +35,16 @@ async def attach(sid):
 async def detach(sid):
     ser.close()
     background_handler.cancel()
+
+@sio.event
+async def status(sid):
+    await sio.emit("returnStatus",ser.is_open)
+
+@sio.event
+async def connect(sid, environ):
+    print("connect ", sid)
+    await sio.emit("returnStatus",ser.is_open)
+
 
 
 @sio.event
