@@ -12,7 +12,7 @@ function App() {
     const [ping, setPing] = useState(0);
     const [Telemetry, setTelemetry] = useState([])
     const [ip, setIP] = useState("http://localhost:8080")
-    const [port, setPort] = useState("com5")
+    const [port, setPort] = useState("COM5")
     useEffect(() => {
         console.log("running use effect")
         socket.on('connect', () => {
