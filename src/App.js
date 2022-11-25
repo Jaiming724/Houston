@@ -1,7 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import io from 'socket.io-client';
-import {Button} from "@mui/material";
 import Header from "./components/Header";
+import StatusCard from "./components/StatusCard";
+import TelemetryCard from "./components/TelemetryCard";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -10,7 +11,10 @@ function App() {
     const [isSerialConnected, setSerialConnected] = useState(false);
     const [ping, setPing] = useState(0);
     const [Telemetry, setTelemetry] = useState([])
+    const [ip, setIP] = useState("http://localhost:8080")
+    const [port, setPort] = useState("com5")
     useEffect(() => {
+        console.log("running use effect")
         socket.on('connect', () => {
             setIsConnected(true);
         });
@@ -41,28 +45,15 @@ function App() {
     }, []);
 
 
-    function changeSerialStatus() {
-        if (isSerialConnected) {
-            socket.emit("detach");
-        } else {
-            socket.emit("attach");
-        }
-        setSerialConnected(!isSerialConnected);
-    }
-
     return (
         <div>
             <Header ping={ping}/>
-            <p>Socket Connected: {'' + isConnected}</p>
-            <p>Serial Connected: {'' + isSerialConnected}</p>
-            <div>
-                {Telemetry.map((ele) => (
-                    <p>{ele}</p>
-                ))}
+
+            <div className="flex">
+                <StatusCard isSocketConnected={isConnected} isSerialConnected={isSerialConnected} socket={socket}
+                            setSerialConnected={setSerialConnected} ip={ip} port={port}/>
+                <TelemetryCard  telemetry={Telemetry}/>
             </div>
-            <Button color={`${isSerialConnected ? 'error' : 'success'}`} variant="contained"
-                    onClick={changeSerialStatus}>{isSerialConnected ? "Detach" : "Attach"}
-            </Button>
 
         </div>
     );
