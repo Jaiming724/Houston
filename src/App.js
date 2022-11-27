@@ -12,9 +12,8 @@ function App() {
     const [ping, setPing] = useState(0);
     const [Telemetry, setTelemetry] = useState([])
     const [ip, setIP] = useState("http://localhost:8080")
-    const [port, setPort] = useState("COM5")
+    const [port, setPort] = useState("COM7")
     useEffect(() => {
-        console.log("running use effect")
         socket.on('connect', () => {
             setIsConnected(true);
         });
@@ -37,6 +36,7 @@ function App() {
             }
 
         });
+
         return () => {
             socket.off('connect');
             socket.off('disconnect');
@@ -51,8 +51,9 @@ function App() {
 
             <div className="flex">
                 <StatusCard isSocketConnected={isConnected} isSerialConnected={isSerialConnected} socket={socket}
-                            setSerialConnected={setSerialConnected} ip={ip} port={port}/>
-                <TelemetryCard  telemetry={Telemetry}/>
+                            setSerialConnected={setSerialConnected} ip={ip} port={port} setIP={setIP}
+                            setPort={setPort}/>
+                <TelemetryCard telemetry={Telemetry}/>
             </div>
 
         </div>

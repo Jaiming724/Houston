@@ -1,6 +1,5 @@
 import React from 'react';
 import Card from "./Card";
-import CheckIcon from '@mui/icons-material/Check';
 
 function TelemetryCard({telemetry}) {
     return (
@@ -8,7 +7,6 @@ function TelemetryCard({telemetry}) {
             {telemetry.map((ele) => (
                 <p className="text-white text-center">{ele}</p>
             ))}
-
         </Card>
     );
 }

@@ -4,13 +4,14 @@ import {Button, TextField} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from '@mui/icons-material/Close';
 
-const StatusCard = ({isSocketConnected, isSerialConnected, socket, setSerialConnected, ip, port}) => {
+const StatusCard = ({isSocketConnected, isSerialConnected, socket, setSerialConnected, ip, port, setIP, setPort}) => {
     function changeSerialStatus() {
         if (isSerialConnected) {
             socket.emit("detach");
         } else {
-            socket.emit("attach");
+            socket.emit("attach", port);
         }
+
         setSerialConnected(!isSerialConnected);
     }
 
@@ -38,10 +39,19 @@ const StatusCard = ({isSocketConnected, isSerialConnected, socket, setSerialConn
             </div>
             <div className="py-3 text-white">
                 <TextField id="standard-basic" label="IP" variant="standard" defaultValue={ip}
-                           sx={{input: {color: 'white'}, label: {color: 'white'}}}/>
+                           sx={{input: {color: 'white'}, label: {color: 'white'}}}
+                           onChange={(e) => {
+                               setIP(e.target.value)
+                           }}
+                />
             </div>
             <div className="py-3">
-                <TextField id="standard-basic" label="Port" variant="standard" defaultValue={port} sx={{input: {color: 'white'}, label: {color: 'white'}}}/>
+                <TextField id="standard-basic" label="Port" variant="standard" defaultValue={port}
+                           sx={{input: {color: 'white'}, label: {color: 'white'}}}
+                           onChange={(e) => {
+                               setPort(e.target.value)
+                           }}
+                />
             </div>
             <div className="text-center">
                 <Button className="w-full" color={`${isSerialConnected ? 'error' : 'success'}`} variant="contained"
