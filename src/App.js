@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import TelemetryCard from "./components/TelemetryCard";
+import Graph from "./components/Graph";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -24,7 +25,9 @@ function App() {
 
 
         socket.on('returnData', (data) => {
-            setTelemetry(data["data"].split(";"));
+            let tele=data["data"].split(";")
+            tele.pop()
+            setTelemetry(tele);
             setPing(Date.now() - data["time"])
         });
 
@@ -55,6 +58,8 @@ function App() {
                             setPort={setPort}/>
                 <TelemetryCard telemetry={Telemetry}/>
             </div>
+            <Graph telemetry={Telemetry}/>
+
 
         </div>
     );

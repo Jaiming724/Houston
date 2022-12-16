@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Card from "./Card";
 
 function TelemetryCard({telemetry}) {
+
     return (
         <Card className="md:min-w-[25%]">
             {telemetry.map((ele) => (
