@@ -8,8 +8,16 @@ import {Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel} from "@mu
 Chart.register(...registerables);
 Chart.register(StreamingPlugin);
 
-export default function Graph({telemetry}) {
+export default function Graph({socket}) {
     const [graphTitle, setGraphTitle] = useState([]);
+    let temp = ""
+    useEffect(() => {
+        socket.on('returnData', (data) => {
+            let tele = data["data"].split(";")
+            tele.pop()
+            temp = tele
+        });
+    })
 
     const MyChart = useMemo(() => (
         <Line
@@ -51,11 +59,11 @@ export default function Graph({telemetry}) {
                                 // datasets.push(newDataset);
                                 // chart.update();
 
-
+                                console.log((temp))
                                 chart.data.datasets.forEach((dataset) => {
                                     dataset.data.push({
                                         x: Date.now(),
-                                        y: parseInt(telemetry[1].split(":")[1])
+                                        y: parseInt(temp[1].split(":")[1])
                                     });
                                 });
                             }
@@ -66,22 +74,8 @@ export default function Graph({telemetry}) {
             type="line"/>), []);
 
     return (
-        <div style={{height: '50vh'}} className="bg-slate-700 shadow-lg rounded my-10">
+        <div style={{height: '50vh'}} className="bg-slate-700 shadow-lg rounded my-10 w-screen">
             {MyChart}
-            {/*<FormControl component="fieldset">*/}
-            {/*    <div className="flex">*/}
-            {/*        {telemetry.map((ele) => (*/}
-            {/*            <FormControlLabel*/}
-            {/*                value="bottom"*/}
-            {/*                control={<Checkbox sx={{color: "white"}}/>}*/}
-            {/*                label={ele.split(":")[0]}*/}
-            {/*                labelPlacement="bottom"*/}
-            {/*            />*/}
-
-            {/*        ))}*/}
-            {/*    </div>*/}
-
-            {/*</FormControl>*/}
         </div>
 
     );

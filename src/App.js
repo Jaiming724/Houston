@@ -25,7 +25,7 @@ function App() {
 
 
         socket.on('returnData', (data) => {
-            let tele=data["data"].split(";")
+            let tele = data["data"].split(";")
             tele.pop()
             setTelemetry(tele);
             setPing(Date.now() - data["time"])
@@ -58,7 +58,7 @@ function App() {
                             setPort={setPort}/>
                 <TelemetryCard telemetry={Telemetry}/>
             </div>
-            <Graph telemetry={Telemetry}/>
+            <Graph socket={socket}/>
 
 
         </div>
