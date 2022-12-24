@@ -2,11 +2,13 @@
 
 Houston is a React based dashboard for monitoring Arduino data. I built it to monitor my university's wind turbine, but it can be used for any Arduino board.  
 
-## Roadmap (not necessarily in order)
+## ToDo (not necessarily in order)
 
 * Cleaner UI
-* Graphs
+* ~~Graphs~~
+* Save Data to File
+* Max,min,etc for variables
 * Migrate to Typescript
-* Configuring variables live
-* Installation guide
+* Configuring Variables Live
+* Installation Guide
 
