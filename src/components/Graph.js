@@ -8,7 +8,6 @@ Chart.register(...registerables);
 Chart.register(StreamingPlugin);
 
 export default function Graph({socket, graphHeaders}) {
-    let telemetryStr = ""
     const map = new Map();
     const colors = ['red', 'blue', 'green', 'purple', 'yellow']
 
@@ -22,7 +21,6 @@ export default function Graph({socket, graphHeaders}) {
                 let temp = tele[i].split(":")
                 map.set(temp[0], temp[1])
             }
-            telemetryStr = tele
         });
     })
 
@@ -39,7 +37,6 @@ export default function Graph({socket, graphHeaders}) {
                     //     data: []
                     // }
 
-
                 ]
             }}
             options={{
@@ -48,7 +45,7 @@ export default function Graph({socket, graphHeaders}) {
                     x: {
                         type: "realtime",
                         realtime: {
-                            delay: 1000,
+                            delay: 2000,
                             onRefresh: (chart) => {
                                 const datasets = chart.data.datasets;
 
@@ -63,7 +60,7 @@ export default function Graph({socket, graphHeaders}) {
                                             borderColor: colors[datasets.length%colors.length],
                                             backgroundColor: colors[datasets.length%colors.length],
                                             cubicInterpolationMode: "monotone",
-                                            fill: true,
+                                            fill: false,
                                             data: []
                                         };
                                         datasets.push(newDataset);
