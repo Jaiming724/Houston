@@ -4,6 +4,8 @@ import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import TelemetryCard from "./components/TelemetryCard";
 import Graph from "./components/Graph";
+import TelemetryHeaders from "./components/TelemetryHeaders";
+import {Checkbox, FormControlLabel} from "@mui/material";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -14,6 +16,9 @@ function App() {
     const [Telemetry, setTelemetry] = useState([])
     const [ip, setIP] = useState("http://localhost:8080")
     const [port, setPort] = useState("COM7")
+
+    const [telemetryHeaders, setTelemetryHeaders] = useState([]);
+    const [graphHeaders, setGraphHeaders] = useState([]);
     useEffect(() => {
         socket.on('connect', () => {
             setIsConnected(true);
@@ -27,6 +32,19 @@ function App() {
         socket.on('returnData', (data) => {
             let tele = data["data"].split(";")
             tele.pop()
+
+            let tempHeader = []
+            for (let i = 0; i < tele.length; i++) {
+
+                tempHeader.push(tele[i].split(":")[0])
+            }
+            setTelemetryHeaders(tempHeader)
+            // for (let i = 0; i < tempHeader.length; i++) {
+            //     if (!graphHeaders.includes(tempHeader[i])) {
+            //         setGraphHeaders([...graphHeaders, tempHeader[i]])
+            //     }
+            // }
+
             setTelemetry(tele);
             setPing(Date.now() - data["time"])
         });
@@ -47,6 +65,14 @@ function App() {
         };
     }, []);
 
+    function handleChange(event) {
+        if (event.target.checked === true) {
+            setGraphHeaders([...graphHeaders, event.target.value])
+        } else {
+            console.log(event.target.value)
+            setGraphHeaders(graphHeaders.filter(item => item !== event.target.value))
+        }
+    }
 
     return (
         <div>
@@ -58,9 +84,9 @@ function App() {
                             setPort={setPort}/>
                 <TelemetryCard telemetry={Telemetry}/>
             </div>
-            <Graph socket={socket}/>
-
-
+            <Graph socket={socket} graphHeaders={graphHeaders}/>
+            <TelemetryHeaders telemetryHeaders={telemetryHeaders} graphHeaders={graphHeaders}
+                              handleChange={handleChange}/>
         </div>
     );
 }

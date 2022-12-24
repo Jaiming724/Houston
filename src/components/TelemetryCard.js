@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Card from "./Card";
 
 function TelemetryCard({telemetry}) {
@@ -13,3 +13,4 @@ function TelemetryCard({telemetry}) {
 }
 
 export default TelemetryCard;
+
