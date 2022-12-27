@@ -2,10 +2,9 @@ import React, {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
-import TelemetryCard from "./components/TelemetryCard";
 import Graph from "./components/Graph";
 import TelemetryHeaders from "./components/TelemetryHeaders";
-import {Checkbox, FormControlLabel} from "@mui/material";
+import TelemetryCard from "./components/TelemetryCard";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -39,11 +38,6 @@ function App() {
                 tempHeader.push(tele[i].split(":")[0])
             }
             setTelemetryHeaders(tempHeader)
-            // for (let i = 0; i < tempHeader.length; i++) {
-            //     if (!graphHeaders.includes(tempHeader[i])) {
-            //         setGraphHeaders([...graphHeaders, tempHeader[i]])
-            //     }
-            // }
 
             setTelemetry(tele);
             setPing(Date.now() - data["time"])
@@ -57,7 +51,6 @@ function App() {
             }
 
         });
-
         return () => {
             socket.off('connect');
             socket.off('disconnect');
@@ -82,7 +75,7 @@ function App() {
                 <StatusCard isSocketConnected={isConnected} isSerialConnected={isSerialConnected} socket={socket}
                             setSerialConnected={setSerialConnected} ip={ip} port={port} setIP={setIP}
                             setPort={setPort}/>
-                <TelemetryCard telemetry={Telemetry}/>
+                <TelemetryCard telemetry={Telemetry} socket={socket}></TelemetryCard>
             </div>
             <Graph socket={socket} graphHeaders={graphHeaders}/>
             <TelemetryHeaders telemetryHeaders={telemetryHeaders} graphHeaders={graphHeaders}
