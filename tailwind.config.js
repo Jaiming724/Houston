@@ -6,8 +6,7 @@ module.exports = {
     theme: {
         extend: {
             black: "#1E1E2F",
-            notblack: "#27293d",
-            "notblackLighter": "#383b54"
+            "lightBlack": "#1e1e1e"
         },
     },
     plugins: [],
