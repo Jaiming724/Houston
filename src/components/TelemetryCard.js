@@ -1,7 +1,7 @@
 import * as React from 'react';
+import {useState} from 'react';
 import {DataGrid} from "@mui/x-data-grid";
 import {Button, TextField} from "@mui/material";
-import {useEffect, useState} from "react";
 
 const columns = [
     {field: 'id', headerName: 'Name', width: 100},
@@ -39,18 +39,15 @@ export default function TelemetryCard({telemetry, socket}) {
                       onSelectionModelChange={itm => setFileHeader(itm)}
                       autoHeight/>
 
-            <div className="px-1 py-2 flex justify-content">
+            <div className="px-1 py-2 flex justify-around">
                 <TextField id="standard-basic" label="File Name" variant="standard" defaultValue={fileName}
                            sx={{input: {color: 'white'}, label: {color: 'white'}}}
                            onChange={(e) => {
                                setFileName(e.target.value)
                            }}
                 />
-                <Button className="mx-auto" color={`${saveData ? 'error' : 'success'}`} variant="contained"
+                <Button  color={`${saveData ? 'error' : 'success'}`} variant="contained"
                         onClick={changeSaveStatus}>{saveData ? "Stop" : "Save To File"}
-                </Button>
-                <Button className="mx-auto" color={`${saveData ? 'error' : 'success'}`} variant="contained"
-                        onClick={(e) => console.log(saveData)}>{"testing"}
                 </Button>
             </div>
         </div>

@@ -66,15 +66,6 @@ export default function Graph({socket, graphHeaders}) {
                                         datasets.push(newDataset);
                                     }
                                 }
-                                // let idx = -1
-                                // for (let i = 0; i < chart.data.datasets.length; i++) {
-                                //     if (chart.data.datasets[i].label === "Dataset 2") {
-                                //         idx = i
-                                //     }
-                                // }
-                                // if (idx !== -1) {
-                                //     chart.data.datasets.splice(idx, 1)
-                                // }
 
                                 chart.update()
                                 chart.data.datasets.forEach((dataset) => {

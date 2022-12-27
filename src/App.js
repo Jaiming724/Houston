@@ -62,7 +62,6 @@ function App() {
         if (event.target.checked === true) {
             setGraphHeaders([...graphHeaders, event.target.value])
         } else {
-            console.log(event.target.value)
             setGraphHeaders(graphHeaders.filter(item => item !== event.target.value))
         }
     }
@@ -75,7 +74,7 @@ function App() {
                 <StatusCard isSocketConnected={isConnected} isSerialConnected={isSerialConnected} socket={socket}
                             setSerialConnected={setSerialConnected} ip={ip} port={port} setIP={setIP}
                             setPort={setPort}/>
-                <TelemetryCard telemetry={Telemetry} socket={socket}></TelemetryCard>
+                <TelemetryCard telemetry={Telemetry} socket={socket}/>
             </div>
             <Graph socket={socket} graphHeaders={graphHeaders}/>
             <TelemetryHeaders telemetryHeaders={telemetryHeaders} graphHeaders={graphHeaders}
