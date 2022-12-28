@@ -16,14 +16,31 @@ sio.attach(app)
 
 background_handler = None
 
-writeToFile = False
+shouldWriteToFile = False
 fileName = ""
 fileHeaders = []
 fileData = []
 
 
+async def writeToFile():
+    file_exists = exists(fileName)
+    temp = fileHeaders.copy()
+    temp.insert(0, "timestamp")
+    if file_exists:
+        with open(fileName, 'a', encoding='UTF8', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=temp)
+            writer.writerows(fileData)
+    else:
+        with open(fileName, 'w', newline='') as f:
+
+            writer = csv.DictWriter(f, fieldnames=temp)
+            writer.writeheader()
+            writer.writerows(fileData)
+    fileData.clear()
+
+
 async def saveToFile(line):
-    if writeToFile and len(fileHeaders) > 0:
+    if shouldWriteToFile and len(fileHeaders) > 0:
         data = line.split(";")
         data.pop()
         tempDict = {}
@@ -36,27 +53,15 @@ async def saveToFile(line):
                 tempDict[telemetryHeader] = telemetryValue
         fileData.append(tempDict)
 
-        if len(fileData) > 50:
-            file_exists = exists(fileName)
-            temp = fileHeaders.copy()
-            temp.insert(0, "timestamp")
-            if file_exists:
-                with open(fileName, 'a', encoding='UTF8') as f:
-                    writer = csv.DictWriter(f, fieldnames=temp)
-                    writer.writerows(fileData)
-            else:
-                with open(fileName, 'w') as f:
-
-                    writer = csv.DictWriter(f, fieldnames=temp)
-                    writer.writeheader()
-                    writer.writerows(fileData)
+        if len(fileData) > 100:
+            await writeToFile()
 
 
 async def background_task():
     while ser.is_open:
         await sio.sleep(0.01)
         try:
-            line = ser.readline().decode('utf-8').strip()
+            line = ser.readline().decode('utf-8').strip().replace("\n", "")
             await saveToFile(line)
             await sio.emit('returnData', {"data": line, "time": round(time.time() * 1000)})
         except UnicodeDecodeError:
@@ -81,16 +86,15 @@ async def detach(sid):
 
 @sio.event
 async def saveStatus(sid, data):
-    global writeToFile
+    global shouldWriteToFile
     global fileHeaders
     global fileName
-    writeToFile = data["status"]
-    if writeToFile:
+    shouldWriteToFile = data["status"]
+    if shouldWriteToFile:
         fileHeaders = data["fileHeader"]
         fileName = data["fileName"]
-        print(fileHeaders)
-        print(fileName)
-        print(writeToFile)
+    else:
+        await writeToFile()
 
 
 @sio.event
