@@ -62,8 +62,9 @@ async def background_task():
         await sio.sleep(0.01)
         try:
             line = ser.readline().decode('utf-8').strip().replace("\n", "")
-            await saveToFile(line)
-            await sio.emit('returnData', {"data": line, "time": round(time.time() * 1000)})
+            if line[:4]=="CWC!":
+                await saveToFile(line)
+                await sio.emit('returnData', {"data": line, "time": round(time.time() * 1000)})
         except UnicodeDecodeError:
             print("Unicode error")
 

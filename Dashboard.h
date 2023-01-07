@@ -52,11 +52,13 @@ public:
     static void send() {
         Serial.println(buffer);
         memset(buffer, 0, sizeof(buffer));
+        strcat(buffer,"CWC!");
+
     }
 
 };
 
-char Dashboard::buffer[] = {0};
+char Dashboard::buffer[] = "CWC!";
 char Dashboard::numBuffer[] = {0};
 char Dashboard::floatBuffer[] = {0};
 
