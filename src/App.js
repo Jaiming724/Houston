@@ -5,6 +5,7 @@ import StatusCard from "./components/StatusCard";
 import Graph from "./components/Graph";
 import TelemetryHeaders from "./components/TelemetryHeaders";
 import TelemetryCard from "./components/TelemetryCard";
+import AlertCard from "./components/AlertCard";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -70,11 +71,12 @@ function App() {
         <div>
             <Header ping={ping}/>
 
-            <div className="flex">
+            <div className="flex max-h-80">
                 <StatusCard isSocketConnected={isConnected} isSerialConnected={isSerialConnected} socket={socket}
                             setSerialConnected={setSerialConnected} ip={ip} port={port} setIP={setIP}
                             setPort={setPort}/>
                 <TelemetryCard telemetry={Telemetry} socket={socket}/>
+                <AlertCard  socket={socket}></AlertCard>
             </div>
             <Graph socket={socket} graphHeaders={graphHeaders}/>
             <TelemetryHeaders telemetryHeaders={telemetryHeaders} graphHeaders={graphHeaders}

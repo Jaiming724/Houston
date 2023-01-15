@@ -63,8 +63,10 @@ async def background_task():
         try:
             line = ser.readline().decode('utf-8').strip().replace("\n", "")
             if line[:4]=="CWC!":
-                await saveToFile(line)
-                await sio.emit('returnData', {"data": line, "time": round(time.time() * 1000)})
+                await saveToFile(line[4:])
+                await sio.emit('returnData', {"data": line[4:], "time": round(time.time() * 1000)})
+            elif line[:5]=="CWCA!":
+                await sio.emit("alert",line[5:])
         except UnicodeDecodeError:
             print("Unicode error")
 
@@ -117,7 +119,7 @@ def disconnect(sid):
 async def init_app():
     # global background_handler
     # background_handler = sio.start_background_task(background_task)
-
+    
     return app
 
 

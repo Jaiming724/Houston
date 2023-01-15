@@ -7,7 +7,7 @@ const TelemetryHeaders = ({telemetryHeaders, graphHeaders, handleChange}) => {
 
             <div className="flex justify-center	">
                 {telemetryHeaders.map((ele) => (
-                    <FormControlLabel
+                    <FormControlLabel key={ele}
                         value={ele}
                         control={<Checkbox sx={{color: "white"}} onChange={handleChange}
                                            checked={graphHeaders.includes(ele)}/>}
