@@ -6,6 +6,7 @@ import Graph from "./components/Graph";
 import TelemetryHeaders from "./components/TelemetryHeaders";
 import TelemetryCard from "./components/TelemetryCard";
 import AlertCard from "./components/AlertCard";
+import ModifyValuesCard from "./components/ModifyValuesCard";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -77,6 +78,7 @@ function App() {
                             setPort={setPort}/>
                 <TelemetryCard telemetry={Telemetry} socket={socket}/>
                 <AlertCard  socket={socket}></AlertCard>
+                {<ModifyValuesCard socket={socket}></ModifyValuesCard>}
             </div>
             <Graph socket={socket} graphHeaders={graphHeaders}/>
             <TelemetryHeaders telemetryHeaders={telemetryHeaders} graphHeaders={graphHeaders}
