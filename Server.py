@@ -104,7 +104,14 @@ async def saveStatus(sid, data):
 async def newValue(sid, data):
     print(data["key"])
     print(data["value"])
+    key = data["key"]
     integer_value =int(data["value"])
+    if key =="ResLoad":
+
+        integer_value=integer_value+200
+        print(integer_value)
+
+
     byte_value = integer_value.to_bytes(2, byteorder='big')
     ser.write(byte_value)
 @sio.event
