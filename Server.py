@@ -62,12 +62,12 @@ async def background_task():
         await sio.sleep(0.01)
         try:
             line = ser.readline().decode('utf-8').strip().replace("\n", "")
-            if line[:4]=="CWC!":
+            if line[:4] == "CWC!":
                 await saveToFile(line[4:])
                 await sio.emit('returnData', {"data": line[4:], "time": round(time.time() * 1000)})
-            elif line[:5]=="CWCA!":
-                await sio.emit("alert",line[5:])
-            elif line[:5]=="CWCM!":
+            elif line[:5] == "CWCA!":
+                await sio.emit("alert", line[5:])
+            elif line[:5] == "CWCM!":
                 await sio.emit("mapData", line[5:])
         except UnicodeDecodeError:
             print("Unicode error")
@@ -100,20 +100,22 @@ async def saveStatus(sid, data):
         fileName = data["fileName"]
     else:
         await writeToFile()
+
+
 @sio.event
 async def newValue(sid, data):
     print(data["key"])
     print(data["value"])
     key = data["key"]
-    integer_value =int(data["value"])
-    if key =="ResLoad":
-
-        integer_value=integer_value+200
+    integer_value = int(data["value"])
+    if key == "ResLoad":
+        integer_value = integer_value + 200
         print(integer_value)
-
 
     byte_value = integer_value.to_bytes(2, byteorder='big')
     ser.write(byte_value)
+
+
 @sio.event
 async def status(sid):
     await sio.emit("returnStatus", ser.is_open if ser is not None else False)
@@ -133,8 +135,9 @@ def disconnect(sid):
 async def init_app():
     # global background_handler
     # background_handler = sio.start_background_task(background_task)
-    
+
     return app
+
 
 
 if __name__ == '__main__':
