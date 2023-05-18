@@ -39,7 +39,7 @@ export default function ModifyValuesCard({socket}) {
 
             // only call setInfo when there are changes. if not, dont call
             if (dirty) {
-                console.log(temp)
+                //console.log(temp)
                 setInfo(temp);
             }
         });

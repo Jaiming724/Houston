@@ -111,6 +111,14 @@ async def newValue(sid, data):
     if key == "ResLoad":
         integer_value = integer_value + 200
         print(integer_value)
+    elif key == "loadPower":
+        integer_value = integer_value + 500
+        print(integer_value)
+    elif key == "generator":
+        integer_value = integer_value + 2000
+
+
+
 
     byte_value = integer_value.to_bytes(2, byteorder='big')
     ser.write(byte_value)

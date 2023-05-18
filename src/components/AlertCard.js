@@ -7,10 +7,11 @@ function AlertCard({socket}) {
     useEffect(() => {
         socket.on("alert", (data) => {
             let tele = data.split(";")
+
             tele.pop()
             setAlerts([...alerts, ...tele])
         })
-    });
+    },[]);
     return (
         <Card>
             <div>

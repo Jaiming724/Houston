@@ -19,10 +19,12 @@ export default function Graph({socket, graphHeaders}) {
             map.clear()
             for (let i = 0; i < tele.length; i++) {
                 let temp = tele[i].split(":")
-                map.set(temp[0], temp[1])
+
+                map.set(temp[0], parseFloat(temp[1]))
+                //console.log(temp[1])
             }
         });
-    })
+    },[])
 
     const MyChart = useMemo(() => (
         <Line
