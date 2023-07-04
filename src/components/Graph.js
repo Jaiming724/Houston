@@ -15,6 +15,7 @@ export default function Graph({socket, graphHeaders}) {
         socket.on('returnData', (data) => {
             let tele = data["data"].split(";")
             tele.pop()
+            console.log(tele)
 
             map.clear()
             for (let i = 0; i < tele.length; i++) {
@@ -24,7 +25,7 @@ export default function Graph({socket, graphHeaders}) {
                 //console.log(temp[1])
             }
         });
-    },[])
+    },)
 
     const MyChart = useMemo(() => (
         <Line
@@ -47,7 +48,7 @@ export default function Graph({socket, graphHeaders}) {
                     x: {
                         type: "realtime",
                         realtime: {
-                            delay: 2000,
+                            delay: 1000,
                             onRefresh: (chart) => {
                                 const datasets = chart.data.datasets;
 
