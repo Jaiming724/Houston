@@ -15,7 +15,7 @@ export default function Graph({socket, graphHeaders}) {
         socket.on('returnData', (data) => {
             let tele = data["data"].split(";")
             tele.pop()
-            console.log(tele)
+            //console.log(tele)
 
             map.clear()
             for (let i = 0; i < tele.length; i++) {

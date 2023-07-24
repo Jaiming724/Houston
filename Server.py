@@ -1,13 +1,14 @@
 import csv
 import datetime
+import struct
 import time
 from os.path import exists
 
 import serial
 import socketio
 from aiohttp import web
-
-port = "COM7"
+import zlib
+port = "COM4"
 ser = None
 
 sio = socketio.AsyncServer(cors_allowed_origins='*')
@@ -20,6 +21,7 @@ shouldWriteToFile = False
 fileName = ""
 fileHeaders = []
 fileData = []
+final_buf = []
 
 
 async def writeToFile():
@@ -57,6 +59,8 @@ async def saveToFile(line):
             await writeToFile()
 
 
+
+
 async def background_task():
     while ser.is_open:
         await sio.sleep(0.01)
@@ -66,6 +70,12 @@ async def background_task():
                 await saveToFile(line[4:])
                 await sio.emit('returnData', {"data": line[4:], "time": round(time.time() * 1000)})
             elif line[:5] == "CWCA!":
+
+                d = line[5:]
+                if len(d)>0:
+                    print(d)
+                else:
+                    print("nothing")
                 await sio.emit("alert", line[5:])
             elif line[:5] == "CWCM!":
                 await sio.emit("mapData", line[5:])
@@ -73,12 +83,13 @@ async def background_task():
             print("Unicode error")
 
 
+
 @sio.event
 async def attach(sid, newPort):
     global ser
     global port
     port = newPort
-    ser = serial.Serial(port, 9600)
+    ser = serial.Serial(port, 9600,timeout=3)
     global background_handler
     background_handler = sio.start_background_task(background_task)
 
@@ -105,23 +116,17 @@ async def saveStatus(sid, data):
 @sio.event
 async def newValue(sid, data):
     print(data["key"])
-    print(data["value"])
-    key = data["key"]
-    integer_value = int(data["value"])
-    if key == "ResLoad":
-        integer_value = integer_value + 200
-        print(integer_value)
-    elif key == "loadPower":
-        integer_value = integer_value + 500
-        print(integer_value)
-    elif key == "generator":
-        integer_value = integer_value + 2000
+    v = int(data["value"])
+    num_bytes = v.to_bytes(4, 'little')
+    packet_id = 13
+    packet_length = 4
+    string_data = b"ABCD"
+    checksum = zlib.crc32(string_data)
+    struct_format = '<BH'+str(packet_length)+'sI'  # little endian,unsigned short,# char string, unsigned int
 
+    packet_data = struct.pack(struct_format, packet_id, packet_length, string_data, checksum)
 
-
-
-    byte_value = integer_value.to_bytes(2, byteorder='big')
-    ser.write(byte_value)
+    ser.write(packet_data)
 
 
 @sio.event
@@ -141,11 +146,14 @@ def disconnect(sid):
 
 
 async def init_app():
-    # global background_handler
-    # background_handler = sio.start_background_task(background_task)
+#     global ser
+#     global port
+#     port = "COM4"
+#     ser = serial.Serial(port, 9600, timeout=3)
+#
+#     background_handler = sio.start_background_task(background_task)
 
     return app
-
 
 
 if __name__ == '__main__':

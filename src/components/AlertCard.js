@@ -4,14 +4,20 @@ import {Button} from "@mui/material";
 
 function AlertCard({socket}) {
     const [alerts, setAlerts] = useState([]);
+
+
     useEffect(() => {
         socket.on("alert", (data) => {
             let tele = data.split(";")
 
             tele.pop()
+
             setAlerts([...alerts, ...tele])
+            if (alerts.length > 100) {
+                setAlerts([])
+            }
         })
-    },[]);
+    });
     return (
         <Card>
             <div>
