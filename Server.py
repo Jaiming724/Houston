@@ -120,11 +120,13 @@ async def newValue(sid, data):
     num_bytes = v.to_bytes(4, 'little')
     packet_id = 13
     packet_length = 4
+    numeric_data = 13.45
     string_data = b"ABCD"
-    checksum = zlib.crc32(string_data)
-    struct_format = '<BH'+str(packet_length)+'sI'  # little endian,unsigned short,# char string, unsigned int
+    check_sum_format = "<{}sf".format(packet_length)
+    checksum = zlib.crc32(struct.pack(check_sum_format, string_data, numeric_data))
+    struct_format = '<BH'+str(packet_length)+'sfI'  # little endian,unsigned short,# char string, unsigned int
 
-    packet_data = struct.pack(struct_format, packet_id, packet_length, string_data, checksum)
+    packet_data = struct.pack(struct_format, packet_id, packet_length, string_data, numeric_data,checksum)
 
     ser.write(packet_data)
 
