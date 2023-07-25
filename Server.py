@@ -1,13 +1,14 @@
 import csv
 import datetime
-import struct
 import time
 from os.path import exists
 
 import serial
 import socketio
 from aiohttp import web
-import zlib
+
+from Packet import ModifyPacket
+
 port = "COM4"
 ser = None
 
@@ -59,8 +60,6 @@ async def saveToFile(line):
             await writeToFile()
 
 
-
-
 async def background_task():
     while ser.is_open:
         await sio.sleep(0.01)
@@ -72,7 +71,7 @@ async def background_task():
             elif line[:5] == "CWCA!":
 
                 d = line[5:]
-                if len(d)>0:
+                if len(d) > 0:
                     print(d)
                 else:
                     print("nothing")
@@ -83,13 +82,12 @@ async def background_task():
             print("Unicode error")
 
 
-
 @sio.event
 async def attach(sid, newPort):
     global ser
     global port
     port = newPort
-    ser = serial.Serial(port, 9600,timeout=3)
+    ser = serial.Serial(port, 9600, timeout=3)
     global background_handler
     background_handler = sio.start_background_task(background_task)
 
@@ -118,17 +116,10 @@ async def newValue(sid, data):
     print(data["key"])
     v = int(data["value"])
     num_bytes = v.to_bytes(4, 'little')
-    packet_id = 13
-    packet_length = 4
-    numeric_data = 13.45
-    string_data = b"ABCD"
-    check_sum_format = "<{}sf".format(packet_length)
-    checksum = zlib.crc32(struct.pack(check_sum_format, string_data, numeric_data))
-    struct_format = '<BH'+str(packet_length)+'sfI'  # little endian,unsigned short,# char string, unsigned int
 
-    packet_data = struct.pack(struct_format, packet_id, packet_length, string_data, numeric_data,checksum)
+    packet = ModifyPacket(13, "NA", 267, "I")
 
-    ser.write(packet_data)
+    ser.write(packet.data)
 
 
 @sio.event
@@ -148,12 +139,12 @@ def disconnect(sid):
 
 
 async def init_app():
-#     global ser
-#     global port
-#     port = "COM4"
-#     ser = serial.Serial(port, 9600, timeout=3)
-#
-#     background_handler = sio.start_background_task(background_task)
+    #     global ser
+    #     global port
+    #     port = "COM4"
+    #     ser = serial.Serial(port, 9600, timeout=3)
+    #
+    #     background_handler = sio.start_background_task(background_task)
 
     return app
 

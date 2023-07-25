@@ -62,3 +62,17 @@ Please ensure you have the following installed
    npm start
    ```
 5. Change the port your Arduino is connected to and hit Attach
+
+## Protocol Specifications
+
+### Modify Packet
+
+This is used to modify a value within the system
+
+* [Format](https://docs.python.org/3/library/struct.html): <BH3s[f/I]I
+    * B: packet id, used to specify type of action
+    * H: Number of bytes contained in string data. For modify packet:3
+    * [#]s: First byte will specify numeric data's type. F for float, I for integer,B for boolean. The next 2 byte will
+      be the variable name to change
+    * [f/I]: The actual numeric data specified by previous, boolean still uses I
+    * I: checksum of 3s[f/I] data
