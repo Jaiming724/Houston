@@ -25,7 +25,7 @@ export default function Graph({socket, graphHeaders}) {
                 //console.log(temp[1])
             }
         });
-    },)
+    }, [])
 
     const MyChart = useMemo(() => (
         <Line
@@ -60,8 +60,8 @@ export default function Graph({socket, graphHeaders}) {
                                     if (!existingLabels.includes(graphHeaders[i])) {
                                         const newDataset = {
                                             label: graphHeaders[i],
-                                            borderColor: colors[datasets.length%colors.length],
-                                            backgroundColor: colors[datasets.length%colors.length],
+                                            borderColor: colors[datasets.length % colors.length],
+                                            backgroundColor: colors[datasets.length % colors.length],
                                             cubicInterpolationMode: "monotone",
                                             fill: false,
                                             data: []

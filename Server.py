@@ -73,8 +73,7 @@ async def background_task():
                 d = line[5:]
                 if len(d) > 0:
                     print(d)
-                else:
-                    print("nothing")
+
                 await sio.emit("alert", line[5:])
             elif line[:5] == "CWCM!":
                 await sio.emit("mapData", line[5:])
@@ -113,11 +112,18 @@ async def saveStatus(sid, data):
 
 @sio.event
 async def newValue(sid, data):
-    print(data["key"])
-    v = int(data["value"])
-    num_bytes = v.to_bytes(4, 'little')
+    key = data["key"]
+    print(key[0])
+    if key[0]=="F":
+        packet = ModifyPacket(13,key[1:], float((data["value"])), "F")
+    elif key[0]=="B":
+        if int(data["value"])==0:
+            packet = ModifyPacket(13,key[1:], 0, "B")
+        else:
+            packet = ModifyPacket(13,key[1:], 13107, "B")
+    else:
+        packet = ModifyPacket(13,key[1:], int((data["value"])), "I")
 
-    packet = ModifyPacket(13, "NA", 267, "I")
 
     ser.write(packet.data)
 

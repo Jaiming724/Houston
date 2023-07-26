@@ -10,14 +10,12 @@ function AlertCard({socket}) {
         socket.on("alert", (data) => {
             let tele = data.split(";")
 
-            tele.pop()
+            // tele.pop()
 
-            setAlerts([...alerts, ...tele])
-            if (alerts.length > 100) {
-                setAlerts([])
-            }
+            setAlerts(alerts.concat(tele))
+
         })
-    });
+    }, []);
     return (
         <Card>
             <div>

@@ -8,7 +8,6 @@
 #define alertBufferSize 100
 #define numBufferSize 12
 #define floatBufferSize 20
-#define inputBufferSize 5
 struct Packet {
     uint8_t packet_id;
     uint16_t packet_length;
@@ -56,12 +55,14 @@ public:
     char numBuffer[numBufferSize] = {0};
     char floatBuffer[floatBufferSize] = {0};
 
-    char mapKeys[mapSize][15] = {{0}};
-    int *mapValues[mapSize] = {0};
+    int floatCount = 0;
+    int intCount = 0;
+    char floatMapKeys[mapSize][4] = {{0}};
+    char integerMapKeys[mapSize][4] = {{0}};
+    int *intMapValues[mapSize] = {nullptr};
+    float *floatMapValues[mapSize] = {nullptr};
     char mapKeysBuffer[mapBufferSize] = {0};
-    char inputBuffer[inputBufferSize] = {0};
-    bool receivedData = false;
-    int inputPos = 0;
+
 
     Dashboard() {
         memset(buffer, 0, buffer_size);
@@ -71,8 +72,6 @@ public:
         strcat(alertBuffer, "CWCA!");
         strcat(mapKeysBuffer, "CWCM");
     }
-
-    bool (*callback)();
 
     void alert(const char *s) {
         if (strlen(alertBuffer) + strlen(s) >= alertBufferSize) {
@@ -130,6 +129,36 @@ public:
         float_to_string(t, precision);
         telemetry(s, floatBuffer);
         memset(floatBuffer, 0, floatBufferSize);
+    }
+
+    void addLiveBoolean(const char *key, bool *ptr) {
+        memcpy(integerMapKeys[intCount], "B", 1);
+        memcpy(integerMapKeys[intCount] + 1, key, 2);
+        intMapValues[intCount] = reinterpret_cast<int *>(ptr);
+        intCount += 1;
+    }
+
+    void addLiveInteger(const char *key, int *ptr) {
+        if (intCount >= mapSize) {
+            alert("Live Integer Value Buffer is filled");
+            return;
+        }
+        memcpy(integerMapKeys[intCount], "I", 1);
+        memcpy(integerMapKeys[intCount] + 1, key, 2);
+        intMapValues[intCount] = ptr;
+        intCount += 1;
+    }
+
+    void addLiveFloat(const char *key, float *ptr) {
+        if (floatCount >= mapSize) {
+            alert("Live Float Value Buffer is filled");
+            return;
+        }
+        memcpy(floatMapKeys[floatCount], "F", 1);
+
+        memcpy(floatMapKeys[floatCount] + 1, key, 2);
+        floatMapValues[floatCount] = ptr;
+        floatCount += 1;
     }
 
     void resetPacket() {
@@ -201,10 +230,37 @@ public:
             }
         }
         if (dataState == CHECKSUM_RECEIVED) {
-            alert(received_packet.packet_id);
-            alert(received_packet.packet_length);
-            alert(received_packet.data_buf);
-            alert(received_packet.checksum);
+            switch (received_packet.packet_id) {
+                case 13:
+                    char type = received_packet.data_buf[0];
+                    char tempBuf[4] = {0};
+                    memcpy(tempBuf, received_packet.data_buf, 3);
+                    if (type == 'I') {
+                        for (int i = 0; i < intCount; i++) {
+                            if (strcmp(integerMapKeys[i], tempBuf) == 0) {
+                                *intMapValues[i] = received_packet.int_data;
+                            }
+                        }
+                    } else if (type == 'F') {
+                        for (int i = 0; i < floatCount; i++) {
+                            if (strcmp(floatMapKeys[i], tempBuf) == 0) {
+                                *floatMapValues[i] = received_packet.float_data;
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < intCount; i++) {
+                            if (strcmp(integerMapKeys[i], tempBuf) == 0) {
+                                if (received_packet.int_data == 0) {
+                                    *((bool *) intMapValues[i]) = false;
+                                } else {
+                                    *((bool *) intMapValues[i]) = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+
             dataState = IDLE;
         }
 
@@ -213,12 +269,12 @@ public:
     void send() {
         processData();
 
-        for (int i = 0; i < mapSize; i++) {
-            strcat(mapKeysBuffer, mapKeys[i]);
-            strcat(mapKeysBuffer, ":");
-            integer_to_string(*(mapValues[i]));
-            strcat(mapKeysBuffer, numBuffer);
-            memset(numBuffer, 0, numBufferSize);
+        for (int i = 0; i < intCount; i++) {
+            strcat(mapKeysBuffer, integerMapKeys[i]);
+            strcat(mapKeysBuffer, ";");
+        }
+        for (int i = 0; i < floatCount; i++) {
+            strcat(mapKeysBuffer, floatMapKeys[i]);
             strcat(mapKeysBuffer, ";");
         }
         Serial.println(buffer);

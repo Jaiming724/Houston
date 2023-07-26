@@ -1,6 +1,8 @@
-import {TextField} from "@mui/material";
+import {Button, Checkbox, TextField} from "@mui/material";
 import Card from "./Card";
-import {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function ModifyValuesCard({socket}) {
     const [info, setInfo] = useState([]);
@@ -11,57 +13,47 @@ export default function ModifyValuesCard({socket}) {
     useEffect(() => {
         socket.on("mapData", (data) => {
             let line = data.split(";");
-            let temp = [];
-            for (let i = 0; i < line.length - 1; i++) {
-                let k = line[i].split(":")[0];
-                let v = line[i].split(":")[1];
-                temp.push({key: k, value: v});
-            }
+            setInfo(line)
 
-            let dirty = false;
-            // check if all keys in temp exist in lastValue
-            // if not, add it to lastValue
-            temp.forEach((obj) => {
-                if (!lastValue.current.has(obj.key)) {
-                    lastValue.current.set(obj.key, obj.value);
-                    dirty = true;
-                }
-            });
-
-            // check if any values in temp exist in lastValue
-            // if not, set lastValue
-            temp.forEach((obj) => {
-                if (lastValue.current.get(obj.key) !== obj.value) {
-                    lastValue.current.set(obj.key, obj.value);
-                    dirty = true;
-                }
-            });
-
-            // only call setInfo when there are changes. if not, dont call
-            if (dirty) {
-                //console.log(temp)
-                setInfo(temp);
-            }
         });
     }, []);
 
     function handle(key, v) {
+        console.log(key, v)
         socket.emit("newValue", {key: key, value: v});
+    }
+
+    function handleButton(k, v) {
+        console.log(v)
+        if (v) {
+            socket.emit("newValue", {key: k, value: 2342});
+
+        } else {
+            socket.emit("newValue", {key: k, value: 0});
+
+        }
+
     }
 
     const card = useMemo(() => (
         <div>
             {info.map((obj) => (
                 <div className="flex items-center">
-                    <p>{obj.key}</p>
-                    <TextField key={obj.key} id="standard-basic" variant="standard" inputProps={{
-                        onKeyUp: (event) => {
-                            if (event.key === "Enter") {
-                                event.stopPropagation();
-                                handle(obj.key, event.target.value)
-                            }
-                        },
-                    }}/>
+                    <p>{obj}</p>
+                    {
+                        obj[0] === "B" ?
+                            <Checkbox {...{inputProps: {'aria-label': {obj}}}} defaultChecked
+                                      onChange={(e) => handle(obj, e.target.checked)}/> :
+                            <TextField key={obj.key} id="standard-basic" variant="standard" inputProps={{
+                                onKeyUp: (event) => {
+                                    if (event.key === "Enter") {
+                                        event.stopPropagation();
+                                        handle(obj, event.target.value)
+                                    }
+                                },
+                            }}/>
+                    }
+
                 </div>
             ))}
         </div>
