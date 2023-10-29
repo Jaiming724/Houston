@@ -25,7 +25,7 @@ export default function Graph({socket, graphHeaders}) {
                 //console.log(temp[1])
             }
         });
-    }, [])
+    })
 
     const MyChart = useMemo(() => (
         <Line

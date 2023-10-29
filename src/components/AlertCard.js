@@ -15,7 +15,7 @@ function AlertCard({socket}) {
             setAlerts(alerts.concat(tele))
 
         })
-    }, []);
+    });
     return (
         <Card>
             <div>
